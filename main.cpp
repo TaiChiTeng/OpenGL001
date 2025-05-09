@@ -73,7 +73,7 @@ int main()
 
     // build and compile our shader zprogram
     // ------------------------------------
-    Shader ourShader1("3.5.shader.vs", "3.3.shader.fs");
+    Shader ourShader1("3.6.shader.vs", "3.6.shader.fs");
     Shader ourShader2("3.1.shader.vs", "3.1.shader.fs");
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
@@ -133,9 +133,6 @@ int main()
 
         // draw our first triangle
         ourShader1.use();
-        float offset = -0.1f;
-        ourShader1.setFloat("xOffset", offset);
-        ourShader1.setFloat("yOffset", offset + 0.6f);
         // draw first triangle using the data from the first VAO
         glBindVertexArray(VAOs[0]);
         glDrawArrays(GL_TRIANGLES, 0, 3);
