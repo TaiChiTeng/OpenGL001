@@ -40,7 +40,11 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 // settings
 const unsigned int SCR_WIDTH = 768;
 const unsigned int SCR_HEIGHT = 768;
+
+// 是否左右镜像纹理2
 bool flipTexture = true;
+// stores how much we're seeing of either texture
+float mixValue = 0.5f;
 
 int main()
 {
@@ -78,17 +82,17 @@ int main()
 
     // build and compile our shader zprogram
     // ------------------------------------
-    Shader ourShader1("4.2.texture.vs", "4.3.texture.fs");
+    Shader ourShader1("4.5.texture.vs", "4.5.texture.fs");
     Shader ourShader2("3.1.shader.vs", "3.1.shader.fs");
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
     float vertices[] = {
         // positions          // colors           // texture coords
-         0.0f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   0.55f, 0.55f, // top right
-         0.0f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   0.55f, 0.45f, // bottom right
-        -0.75f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,  0.45f, 0.45f, // bottom left
-        -0.75f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,  0.45f, 0.55f  // top left 
+         0.0f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   2.0f, 2.0f, // top right
+         0.0f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   2.0f, 0.0f, // bottom right
+        -0.75f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
+        -0.75f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 2.0f  // top left 
     };
     unsigned int indices[] = {
         0, 1, 3, // first triangle
@@ -146,11 +150,11 @@ int main()
     // set the texture wrapping parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);	// set texture wrapping to GL_REPEAT (default wrapping method)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    float borderColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
+    float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
     glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
     // set texture filtering parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     // load image, create texture and generate mipmaps
     int width, height, nrChannels;
     stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
@@ -216,9 +220,11 @@ int main()
         glBindTexture(GL_TEXTURE_2D, texture1);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
-
+        
         // render container
         ourShader1.use();
+        // set the texture mix value in the shader
+        ourShader1.setFloat("mixValue", mixValue);
         ourShader1.setBool("flipTexture", flipTexture);
         glBindVertexArray(VAOs[0]);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -260,6 +266,18 @@ void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+    {
+        mixValue += 0.001f; // change this value accordingly (might be too slow or too fast based on system hardware)
+        if (mixValue >= 1.0f)
+            mixValue = 1.0f;
+    }
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+    {
+        mixValue -= 0.001f; // change this value accordingly (might be too slow or too fast based on system hardware)
+        if (mixValue <= 0.0f)
+            mixValue = 0.0f;
+    }
     //if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
     //    flipTexture = !flipTexture;
     //放在每帧执行的processInput里边：会持续检测空格键，纹理会翻转得贼快
