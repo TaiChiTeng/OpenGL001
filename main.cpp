@@ -34,9 +34,13 @@ void processInput(GLFWwindow* window);
 //通常在主循环（ while  循环）中每帧调用，检测按键状态并执行相应操作（如移动摄像机、关闭窗口等）。
 //让程序能够响应用户交互（如 WASD 移动、退出程序等）。
 
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+// 新增回调函数：空格键
+
 // settings
 const unsigned int SCR_WIDTH = 768;
 const unsigned int SCR_HEIGHT = 768;
+bool flipTexture = true;
 
 int main()
 {
@@ -62,6 +66,7 @@ int main()
     }
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetKeyCallback(window, key_callback); // 注册按键回调函数
 
     // glad: load all OpenGL function pointers
     // ---------------------------------------
@@ -73,7 +78,7 @@ int main()
 
     // build and compile our shader zprogram
     // ------------------------------------
-    Shader ourShader1("4.2.texture.vs", "4.2.texture.fs");
+    Shader ourShader1("4.2.texture.vs", "4.3.texture.fs");
     Shader ourShader2("3.1.shader.vs", "3.1.shader.fs");
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
@@ -212,6 +217,7 @@ int main()
 
         // render container
         ourShader1.use();
+        ourShader1.setBool("flipTexture", flipTexture);
         glBindVertexArray(VAOs[0]);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
@@ -252,6 +258,22 @@ void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+    //if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+    //    flipTexture = !flipTexture;
+    //放在每帧执行的processInput里边：会持续检测空格键，纹理会翻转得贼快
+}
+
+// 新增：按键回调函数
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    //if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+        //glfwSetWindowShouldClose(window, true);
+
+    // 空格键按下时切换纹理翻转状态
+    if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
+    {
+        flipTexture = !flipTexture;
+    }
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
