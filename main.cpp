@@ -73,7 +73,8 @@ int main()
 
     // build and compile our shader zprogram
     // ------------------------------------
-    Shader ourShader("2.1.shader.vs", "2.1.shader.fs");
+    Shader ourShader1("2.1.shader.vs", "2.1.shader.fs");
+    Shader ourShader2("2.1.shader.vs", "2.2.shader.fs");
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -126,11 +127,12 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         // draw our first triangle
-        ourShader.use();
-
+        ourShader1.use();
         // draw first triangle using the data from the first VAO
         glBindVertexArray(VAOs[0]);
         glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        ourShader2.use();
         // then we draw the second triangle using the data from the second VAO
         glBindVertexArray(VAOs[1]);
         glDrawArrays(GL_TRIANGLES, 0, 3);
