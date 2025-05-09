@@ -73,7 +73,7 @@ int main()
 
     // build and compile our shader zprogram
     // ------------------------------------
-    Shader ourShader1("3.3.shader.vs", "3.3.shader.fs");
+    Shader ourShader1("3.4.shader.vs", "3.3.shader.fs");
     Shader ourShader2("3.1.shader.vs", "3.1.shader.fs");
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
