@@ -11,6 +11,10 @@
 
 #include <learnopengl/shader_s.h>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include <iostream>
 //是 C++ 中的一个预处理指令，用于包含标准输入/输出流库（I/O Stream Library）。  
 // 提供基本的输入/输出功能  
@@ -82,7 +86,7 @@ int main()
 
     // build and compile our shader zprogram
     // ------------------------------------
-    Shader ourShader1("4.5.texture.vs", "4.5.texture.fs");
+    Shader ourShader1("5.1.texture.vs", "4.5.texture.fs");
     Shader ourShader2("3.1.shader.vs", "3.1.shader.fs");
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
@@ -199,6 +203,7 @@ int main()
     ourShader1.use(); // don't forget to activate/use the shader before setting uniforms!
     // either set it manually like so:
     glUniform1i(glGetUniformLocation(ourShader1.ID, "texture1"), 0);
+    
     // or set it via the texture class
     ourShader1.setInt("texture2", 1);
 
@@ -220,9 +225,17 @@ int main()
         glBindTexture(GL_TEXTURE_2D, texture1);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
-        
-        // render container
+
+        // create transformations
+        glm::mat4 transform = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+        transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
+        transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+
+        // get matrix's uniform location and set matrix
         ourShader1.use();
+        unsigned int transformLoc = glGetUniformLocation(ourShader1.ID, "transform");
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
+
         // set the texture mix value in the shader
         ourShader1.setFloat("mixValue", mixValue);
         ourShader1.setBool("flipTexture", flipTexture);
