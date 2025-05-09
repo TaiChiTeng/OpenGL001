@@ -73,15 +73,16 @@ int main()
 
     // build and compile our shader zprogram
     // ------------------------------------
-    Shader ourShader1("2.1.shader.vs", "2.1.shader.fs");
+    Shader ourShader1("3.3.shader.vs", "3.3.shader.fs");
     Shader ourShader2("3.1.shader.vs", "3.1.shader.fs");
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
     float firstTriangle[] = {
-        -0.9f, -0.5f, 0.0f,  // left 
-        -0.0f, -0.5f, 0.0f,  // right
-        -0.45f, 0.5f, 0.0f,  // top 
+        // positions         // colors
+        -0.9f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  // bottom right
+         0.0f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  // bottom left
+        -0.45f, 0.5f, 0.0f,  0.0f, 0.0f, 1.0f   // top 
     };
     float secondTriangle[] = {
         0.0f, -0.5f, 0.0f,  // left
@@ -96,8 +97,12 @@ int main()
     glBindVertexArray(VAOs[0]);
     glBindBuffer(GL_ARRAY_BUFFER, VBOs[0]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(firstTriangle), firstTriangle, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);	// Vertex attributes stay the same
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);	// Vertex attributes stay the same
     glEnableVertexAttribArray(0);
+    // color attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
     // glBindVertexArray(0); // no need to unbind at all as we directly bind a different VAO the next few lines
     // second triangle setup
     // ---------------------
