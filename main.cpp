@@ -74,7 +74,7 @@ int main()
     // build and compile our shader zprogram
     // ------------------------------------
     Shader ourShader1("2.1.shader.vs", "2.1.shader.fs");
-    Shader ourShader2("2.1.shader.vs", "2.2.shader.fs");
+    Shader ourShader2("3.1.shader.vs", "3.1.shader.fs");
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -134,6 +134,14 @@ int main()
 
         ourShader2.use();
         // then we draw the second triangle using the data from the second VAO
+        // update shader uniform
+        double blinkSpeed = 20;
+        double timeValue = glfwGetTime()*blinkSpeed;
+        float greenValue = static_cast<float>(sin(timeValue) / 2.0 + 0.5);
+        // int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+        // glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+        // Shader类里边实现了可以设置指定的Int、Bool、Float，改为直接用ourColorY更新FragColor.Y的值就行
+        ourShader2.setFloat("ourColorY", greenValue);
         glBindVertexArray(VAOs[1]);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
