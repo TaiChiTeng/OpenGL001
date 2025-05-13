@@ -207,6 +207,7 @@ int main()
     // or set it via the texture class
     ourShader1.setInt("texture2", 1);
 
+    bool CardYDir = true;
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -226,10 +227,35 @@ int main()
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
 
-        // create transformations
-        glm::mat4 transform = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-        //transform = glm::translate(transform, glm::vec3(0.0f, 0.0f, 0.0f));
-        //transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+        // --- 关键修改：周期性旋转控制 ---
+        float total_time = (float)glfwGetTime(); // 获取总时间
+        float cycle_time = fmod(total_time, 10.0f); // 10秒周期（3秒旋转 + 2秒停顿 + 3秒反向旋转 + 2秒停顿）
+        float rotation_angle = 0.0f;
+        float direction = 1.0f;  // 初始方向为正向
+
+        if (cycle_time < 3.0f) {
+            // 阶段1：正向旋转3秒（0° → 180°）
+            rotation_angle = cycle_time * glm::radians(60.0f); // 每秒60°
+            direction = 1.0f;
+        } 
+        else if (cycle_time < 5.0f) {
+            // 阶段2：停顿2秒（保持180°）
+            rotation_angle = glm::radians(180.0f);
+        } 
+        else if (cycle_time < 8.0f) {
+            // 阶段3：反向旋转3秒（180° → 0°）
+            rotation_angle = glm::radians(180.0f) - (cycle_time - 5.0f) * glm::radians(60.0f);
+            direction = -1.0f;
+        } 
+        else {
+            // 阶段4：停顿2秒（保持0°）
+            rotation_angle = 0.0f;
+        }
+
+        // 应用变换矩阵
+        glm::mat4 transform = glm::mat4(1.0f);
+        transform = glm::translate(transform, glm::vec3(0.5f, 0.0f, 0.0f));
+        transform = glm::rotate(transform, rotation_angle, glm::vec3(0.0f, 0.0f, 1.0f));
 
         // get matrix's uniform location and set matrix
         ourShader1.use();
